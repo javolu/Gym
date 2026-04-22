@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitChallenge</title>
+
+<style>
+:root{
+  --bg:#0a0a0a;
+  --card:#181818;
+  --border:#252525;
+  --red:#ff3c3c;
+  --orange:#ff7c2a;
+  --green:#3de07a;
+  --white:#f0ede8;
+  --muted:#777;
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--white);
+  font-family:sans-serif;
+}
+
+.page{display:none;padding:20px;}
+.page.on{display:block;}
+
+input,button{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border-radius:8px;
+  border:none;
+}
+
+button{
+  background:var(--red);
+  color:white;
+  cursor:pointer;
+}
+
+.card{
+  background:var(--card);
+  padding:16px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="page on" id="login">
+  <h2>FitChallenge</h2>
+  <input id="user" placeholder="Usuario">
+  <input id="pass" type="password" placeholder="Password">
+  <button onclick="login()">Entrar</button>
+</div>
+
+<div class="page" id="home">
+  <h2 id="welcome"></h2>
+  <div class="card" id="rutina"></div>
+  <button onclick="logout()">Salir</button>
+</div>
+
+<script>
+let DB = JSON.parse(localStorage.getItem("fitDB") || "{}");
+let currentUser = null;
+
+function login(){
+  let u = user.value.trim();
+  let p = pass.value.trim();
+
+  if(!u || !p){
+    alert("Completa datos");
+    return;
+  }
+
+  if(!DB[u]){
+    DB[u] = {pass:p, peso:80};
+    save();
+  }
+
+  if(DB[u].pass !== p){
+    alert("Password incorrecto");
+    return;
+  }
+
+  currentUser = u;
+  showHome();
+}
+
+function logout(){
+  currentUser = null;
+  go("login");
+}
+
+function save(){
+  localStorage.setItem("fitDB", JSON.stringify(DB));
+}
+
+function go(id){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("on"));
+  document.getElementById(id).classList.add("on");
+}
+
+function showHome(){
+  go("home");
+  welcome.innerText = "Bienvenido " + currentUser;
+
+  let rutinaSemana = [
+    "Pecho + Tríceps",
+    "Espalda + Bíceps",
+    "Pierna",
+    "Hombro + Core",
+    "Cardio",
+    "Activo",
+    "Descanso"
+  ];
+
+  let hoy = new Date().getDay();
+  let idx = hoy === 0 ? 6 : hoy - 1;
+
+  rutina.innerHTML = "<b>Hoy:</b> " + rutinaSemana[idx];
+}
+</script>
+
+</body>
+</html>
